@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Product Management</h1>
+    <form id="productForm">
+      <input type="text" id="productName" placeholder="Product Name" required />
+      <button type="submit">Add Product</button>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTable"></tbody>
+    </table>
+  </div>
+  <script>
+    const token = localStorage.getItem("token");
+
+    // Fetch products
+    const fetchProducts = () => {
+      fetch("http://localhost:7000/crud/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((products) => {
+          const table = document.getElementById("productTable");
+          table.innerHTML = "";
+          products.forEach((product) => {
+            const row = `<tr>
+              <td>${product.id}</td>
+              <td>${product.username}</td>
+              <td>
+                <button onclick="deleteProduct(${product.id})">Delete</button>
+                <button onclick="editProduct(${product.id}, '${product.username}')">Edit</button>
+              </td>
+            </tr>`;
+            table.innerHTML += row;
+          });
+        });
+    };
+
+    // Add product
+    document.getElementById("productForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const productName = document.getElementById("productName").value;
+
+      fetch("http://localhost:7000/crud/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: productName }),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          fetchProducts();
+          document.getElementById("productName").value = "";
+        });
+    });
+
+    // Delete product
+    const deleteProduct = (id) => {
+      fetch(`/crud/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(() => fetchProducts());
+    };
+
+    // Edit product
+    const editProduct = (id, currentName) => {
+      const newName = prompt("Enter new product name:", currentName);
+      if (newName) {
+        fetch(`/crud/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ username: newName }),
+        }).then(() => fetchProducts());
+      }
+    };
+
+    fetchProducts();
+  </script>
+</body>
+</html>
