@@ -8,7 +8,7 @@ const __dirname = path.resolve();
 
 const app = express();
 app.use(cors({
- origin: "http://127.0.0.1:5500/",
+ origin: "http://127.0.0.1:5500",
 }
 ))
 app.use(bodyParser.json());

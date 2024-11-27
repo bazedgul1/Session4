@@ -23,15 +23,19 @@
       const password = document.getElementById("password").value;
 
       fetch("http://localhost:7000/auth/register", {
+        mode: 'no-cors',
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       })
         .then((res) => res.text())
         .then((message) => {
-          alert(message);
+          alert("Register Successfully");
           window.location.href = "./login.html";
-        });
+        })
+        .catch((error) =>{
+        alert("Failed")
+        })
     });
   </script>
 </body>
